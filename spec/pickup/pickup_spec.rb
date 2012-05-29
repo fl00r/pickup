@@ -16,7 +16,7 @@ describe Pickup do
     @pickup = Pickup.new(@list)
   end
 
-  it "should be equal" do
+  it "should pick correct ammount of items" do
     @pickup.pick(2).size.must_equal 2
   end
 
@@ -26,23 +26,24 @@ describe Pickup do
       @ml = Pickup::MappedList.new(@list, @func, true)
       @ml2 = Pickup::MappedList.new(@list, @func)
     end
-    it "should return mapped list" do
+
+    it "should return right mapped list" do
       @ml.list.must_equal(@mapped_list)
     end
 
-    it "should return selmon and then carp and then crucian" do
+    it "should return selmon and then carp and then crucian for uniq pickup" do
       @ml.get_random_item(1).must_equal "selmon"
       @ml.get_random_item(1).must_equal "carp"
       @ml.get_random_item(1).must_equal "crucian"
     end
 
-    it "should return selmon 3 times" do
+    it "should return selmon 3 times for non-uniq pickup" do
       @ml2.get_random_item(1).must_equal "selmon"
       @ml2.get_random_item(1).must_equal "selmon"
       @ml2.get_random_item(1).must_equal "selmon"
     end
 
-    it "should return first item after last" do
+    it "should return item from the beginning after end of list for uniq pickup" do
       @ml.get_random_item(30).must_equal "gudgeon"
       @ml.get_random_item(30).must_equal "minnow"
       @ml.get_random_item(30).must_equal "selmon"
