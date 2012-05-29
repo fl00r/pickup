@@ -40,7 +40,7 @@ So we should create our pickup.
     pickup.pick(3)
     #=> [ "gudgeon", "minnow", "minnow" ]
   ```
-Look, we've just catched few minnows! To get selmon we need some mor tries ;)
+Look, we've just catched few minnows! To get selmon we need some more tries ;)
 
 Ok. What if our probability is not a linear function. We can create our pickup with a function:
 
@@ -61,7 +61,7 @@ Or you can pass a block as a probability function wich will be applicable only t
 
   ```ruby
     pickup = Pickup.new(pond)
-    pickup.pick{ |v| 1/v } # same as pickup.pick(1){ ... }
+    pickup.pick{ |v| Math.sin(v) } # same as pickup.pick(1){ ... }
     #=> "selmon"
     pickup.pick
     #=> "minnow"
