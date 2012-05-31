@@ -1,17 +1,18 @@
 require "pickup/version"
 
 class Pickup
-  attr_reader :list
+  attr_reader :list, :uniq
   attr_writer :pick_func
 
-  def initialize(list, &block)
+  def initialize(list, uniq=false, &block)
     @list = list
+    @uniq = uniq
     @pick_func = block if block_given?
   end
 
   def pick(count=1, &block)
     func = block || pick_func
-    mlist = MappedList.new(list, func)
+    mlist = MappedList.new(list, func, uniq)
     result = count.times.map do |i|
       mlist.random
     end
