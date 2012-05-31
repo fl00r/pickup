@@ -28,30 +28,12 @@ class Pickup
   end
 
   class MappedList
-    attr_reader :list, :func, :uniq
+    attr_reader :list, :func, :uniq, :max
 
     def initialize(list, func, uniq=false)
       @func = func
       @uniq = uniq
       @list = map_list(list)
-    end
-
-    def map_list(list)
-      n = 0
-      mapped_list = {}
-      list.each do |k, v|
-        n += v
-        mapped_list[k] = {}
-        mapped_list[k][:value] = n
-        mapped_list[k][:picked] = false if uniq
-      end
-      mapped_list
-    end
-
-    def max
-      @max ||= begin
-        list.inject(0){|sum, (k,v)| sum+list[k][:value] }
-      end
     end
 
     def random
@@ -70,6 +52,20 @@ class Pickup
       key = item[0]
       list[key][:picked] = true if uniq
       key
+    end
+    
+  private
+
+    def map_list(list)
+      @max = 0
+      mapped_list = {}
+      list.each do |k, v|
+        mapped_list[k] = {}
+        mapped_list[k][:value] = @max
+        @max += v
+        mapped_list[k][:picked] = false if uniq
+      end
+      mapped_list
     end
   end
 end
