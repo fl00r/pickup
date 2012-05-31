@@ -14,6 +14,7 @@ describe Pickup do
     }
     @func = Proc.new{ |a| a }
     @pickup = Pickup.new(@list)
+    @pickup2 = Pickup.new(@list, true)
   end
 
   it "should pick correct ammount of items" do
@@ -48,5 +49,10 @@ describe Pickup do
       @ml.get_random_item(30).must_equal "minnow"
       @ml.get_random_item(30).must_equal "selmon"
     end
+  end
+
+  it "should take 7 different fish" do
+    items = @pickup2.pick(7)
+    items.uniq.size.must_equal 7
   end
 end

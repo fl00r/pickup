@@ -63,9 +63,9 @@ class Pickup
       item = list.detect do |k,v|
         val = func.call v[:value]
         num = func.call n
-        val >= num && !(uniq && v[:picked])
+        (val >= num) && !(uniq && v[:picked])
       end
-      item ||= list.first{ |k,v| !v[:picked] }
+      item ||= list.detect{ |k,v| !v[:picked] }
       raise "No items left" unless item
       key = item[0]
       list[key][:picked] = true if uniq
