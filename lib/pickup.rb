@@ -4,9 +4,9 @@ class Pickup
   attr_reader :list, :uniq
   attr_writer :pick_func
 
-  def initialize(list, uniq=false, &block)
+  def initialize(list, opts={}, &block)
     @list = list
-    @uniq = uniq
+    @uniq = opts[:uniq] || false
     @pick_func = block if block_given?
   end
 

@@ -14,7 +14,7 @@ describe Pickup do
     }
     @func = Proc.new{ |a| a }
     @pickup = Pickup.new(@list)
-    @pickup2 = Pickup.new(@list, true)
+    @pickup2 = Pickup.new(@list, uniq: true)
   end
 
   it "should pick correct ammount of items" do

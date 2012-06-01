@@ -67,6 +67,21 @@ pickup.pick
 #=> "minnow"
 ```
 
+### Random uniq pick
+
+Also we can pick random uniq items from the list
+
+```ruby
+pickup = Pickup.new(pond, uniq: true)
+pickup.pick(3)
+#=> [ "gudgeon", "herring", "minnow" ]
+pickup.pick
+#=> "herring"
+pickup.pick
+#=> "gudgeon"
+pickup.pick
+#=> "sturgeon"
+```
 
 ## Contributing
 
