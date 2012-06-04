@@ -26,32 +26,26 @@ class Pickup
   end
 
   class CircleIterator
-    attr_reader :func, :obj
+    attr_reader :func, :obj, :max
 
-    def initialize(obj, func)
+    def initialize(obj, func, max)
       @obj = obj.dup
       @func = func
+      @max = max
     end
 
     def each
-      mx = max
       until obj.empty?
         start = 0
         obj.each do |item, weight|
           val = func.call(weight)
           start += val
-          if yield([item, start, mx])
+          if yield([item, start, max])
             obj.delete item
-            mx = max
+            @max -= val
           end
         end
       end
-    end
-
-    def max
-      max = 0
-      obj.each{ |item| max += func.call(item[1]) }
-      max
     end
   end
 
@@ -66,7 +60,7 @@ class Pickup
     end
 
     def each(&blk)
-      CircleIterator.new(@list, func).each do |item|
+      CircleIterator.new(@list, func, max).each do |item|
         if uniq
           true if yield item
         else
@@ -82,14 +76,13 @@ class Pickup
     end
 
     def get_random_items(nums)
-      next_num = Proc.new{ nums.shift }
-      current_num = next_num.call
+      current_num = nums.shift
       items = []
       each do |item, counter, mx|
         break unless current_num
         if counter%(mx+1) > current_num%mx
           items << item
-          current_num = next_num.call
+          current_num = nums.shift
           true
         end
       end
@@ -97,9 +90,11 @@ class Pickup
     end
 
     def max
-      max = 0
-      list.each{ |item| max += func.call(item[1]) }
-      max
+      @max ||= begin
+        max = 0
+        list.each{ |item| max += func.call(item[1]) }
+        max
+      end
     end
   end
 end
