@@ -46,8 +46,6 @@ def big_weights(uniq=false)
   pickup.pick(100)
 end
 
-
-
 n = 500
 
 Benchmark.bm do |x|

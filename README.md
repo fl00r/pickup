@@ -31,7 +31,7 @@ pond = {
   "minnow" => 20
 }
 ```
-Values are a chence to get this fish.
+Values are a chance (probability) to get this fish.
 
 So we should create our pickup.
 
@@ -42,6 +42,8 @@ pickup.pick(3)
 ```
 Look, we've just catched few minnows! To get selmon we need some more tries ;)
 
+### Custom distribution function
+
 Ok. What if our probability is not a linear function. We can create our pickup with a function:
 
 ```ruby
@@ -51,7 +53,7 @@ pickup.pick(3)
 ```
 Wow, good catch!
 
-Also you can change our `function` on the fly. Let's make square function:
+Also you can change our "function" on the fly. Let's make square function:
 
 ```ruby
 pickup = Pickup.new(pond)
@@ -65,6 +67,22 @@ pickup.pick{ |v| Math.sin(v) } # same as pickup.pick(1){ ... }
 #=> "selmon"
 pickup.pick
 #=> "minnow"
+```
+
+In case of `f(weight)=weight^10` most possible result will be "minnow", because `20^10` is `2^10` more possible then "gudgeon"
+
+```ruby
+pickup = Pickup.new(pond)
+pickup.pick(10){ |v| v**10 }
+#=> ["minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow"]
+```
+
+Or you can use reverse probability:
+
+```ruby
+pickup = Pickup.new(pond)
+pickup.pick(10){ |v| v**(-10) }
+#=> ["selmon", "selmon", "selmon", "selmon", "crucian", "selmon", "selmon", "selmon", "selmon", "selmon"]
 ```
 
 ### Random uniq pick
@@ -82,25 +100,6 @@ pickup.pick
 pickup.pick
 #=> "sturgeon"
 ```
-
-### Custom probability function
-
-You can define your own function. So in case of `f(weight)=weight^10` most possible result will be "minnow", because `20^10` is `2^10` more possible then "gudgeon"
-```ruby
-pickup = Pickup.new(pond)
-pickup.pick(10){ |v| v**10 }
-#=> ["minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow"]
-```
-
-Or you can use reverse probability:
-
-```ruby
-pickup = Pickup.new(pond)
-pickup.pick(10){ |v| v**(-10) }
-#=> ["selmon", "selmon", "selmon", "selmon", "crucian", "selmon", "selmon", "selmon", "selmon", "selmon"]
-```
-
-Reverse
 
 ## Contributing
 
