@@ -49,7 +49,9 @@ class Pickup
     end
 
     def max
-      obj.inject(0){ |mx, item| mx += func.call(item[1]) }
+      max = 0
+      obj.each{ |item| max += func.call(item[1]) }
+      max
     end
   end
 
@@ -95,7 +97,9 @@ class Pickup
     end
 
     def max
-      list.inject(0){ |mx, item| mx += func.call(item[1]) }
+      max = 0
+      list.each{ |item| max += func.call(item[1]) }
+      max
     end
   end
 end

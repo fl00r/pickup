@@ -60,8 +60,13 @@ describe Pickup do
     proc{ items = @pickup2.pick(8) }.must_raise RuntimeError
   end
 
-  it "should return include most wegtful item (but not always - sometimes it will fail)" do
+  it "should return include most weigtfull item (but not always - sometimes it will fail)" do
     items = @pickup2.pick(2){ |v| v**20 }
     (items.include? "minnow").must_equal true
+  end
+
+  it "should return include less weigtfull item (but not always - sometimes it will fail)" do
+    items = @pickup2.pick(2){ |v| v**(-20) }
+    (items.include? "selmon").must_equal true
   end
 end
