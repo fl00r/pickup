@@ -4,13 +4,13 @@ require 'spec_helper'
 describe Pickup do
   before do
     @list = {
-      "selmon"  => 1,
-      "carp" => 4,
-      "crucian"  => 3,
-      "herring" => 6,
-      "sturgeon" => 8,
-      "gudgeon" => 10,
-      "minnow" => 20
+      "selmon"  => 1,     # 1
+      "carp" => 4,        # 5
+      "crucian"  => 3,    # 8
+      "herring" => 6,     # 14
+      "sturgeon" => 8,    # 22
+      "gudgeon" => 10,    # 32
+      "minnow" => 20      # 52
     }
     @func = Proc.new{ |a| a }
     @pickup = Pickup.new(@list)
@@ -43,7 +43,7 @@ describe Pickup do
     end
 
     it "should return item from the beginning after end of list for uniq pickup" do
-      @ml.get_random_items([20, 20, 20, 20]).must_equal ["sturgeon", "gudgeon", "minnow", "selmon"]
+      @ml.get_random_items([20, 20, 20, 20]).must_equal ["sturgeon", "gudgeon", "minnow", "crucian"]
     end
 
     it "should return right max" do

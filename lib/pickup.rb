@@ -26,20 +26,30 @@ class Pickup
   end
 
   class CircleIterator
-    def initialize(obj)
+    attr_reader :func, :obj
+
+    def initialize(obj, func)
       @obj = obj.dup
+      @func = func
     end
 
     def each
-      start = 0
-      until @obj.empty?
-        @obj.each do |item, weight|
-          start += weight
-          if yield([item, start])
-            @obj.delete item
+      mx = max
+      until obj.empty?
+        start = 0
+        obj.each do |item, weight|
+          val = func.call(weight)
+          start += val
+          if yield([item, start, mx])
+            obj.delete item
+            mx = max
           end
         end
       end
+    end
+
+    def max
+      obj.inject(0){ |mx, item| mx += func.call(item[1]) }
     end
   end
 
@@ -54,7 +64,7 @@ class Pickup
     end
 
     def each(&blk)
-      CircleIterator.new(@list).each do |item|
+      CircleIterator.new(@list, func).each do |item|
         if uniq
           true if yield item
         else
@@ -65,7 +75,7 @@ class Pickup
 
     def random(count)
       raise "List is shorter then count of items you want to get" if uniq && list.size < count
-      nums = count.times.map{ rand(func.call(max)) }.sort
+      nums = count.times.map{ rand(max) }.sort
       get_random_items(nums)
     end
 
@@ -73,10 +83,9 @@ class Pickup
       next_num = Proc.new{ nums.shift }
       current_num = next_num.call
       items = []
-      each do |item, counter|
+      each do |item, counter, mx|
         break unless current_num
-        val = func.call(counter)
-        if val > current_num
+        if counter%(mx+1) > current_num%mx
           items << item
           current_num = next_num.call
           true
@@ -86,9 +95,7 @@ class Pickup
     end
 
     def max
-      @max ||= begin
-        list.inject(0){ |mx, item| mx += item[1]}
-      end
+      list.inject(0){ |mx, item| mx += func.call(item[1]) }
     end
   end
 end
