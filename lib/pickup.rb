@@ -26,22 +26,22 @@ class Pickup
   end
 
   class CircleIterator
-      def initialize(obj)
-        @obj = obj.dup
-      end
+    def initialize(obj)
+      @obj = obj.dup
+    end
 
-      def each
-        start = 0
-        until @obj.empty?
-          @obj.each do |item, weight|
-            start += weight
-            if yield([item, start])
-              @obj.delete item
-            end
+    def each
+      start = 0
+      until @obj.empty?
+        @obj.each do |item, weight|
+          start += weight
+          if yield([item, start])
+            @obj.delete item
           end
         end
       end
     end
+  end
 
   class MappedList
     attr_reader :list, :func, :uniq

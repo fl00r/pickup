@@ -83,6 +83,15 @@ pickup.pick
 #=> "sturgeon"
 ```
 
+### Custom probability function
+
+You can define your own function. So in case of `f(weight)=weight^10` most possible result will be "minnow", because `20^10` is `2^10` more possible then "gudgeon"
+```ruby
+pickup = Pickup.new(pond)
+pickup.pick(10){ |v| v**10 }
+#=> ["minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow"]
+```
+
 ## Contributing
 
 1. Fork it
