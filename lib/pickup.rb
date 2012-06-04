@@ -25,9 +25,26 @@ class Pickup
     end
   end
 
+  class CircleIterator
+      def initialize(obj)
+        @obj = obj.dup
+      end
+
+      def each
+        start = 0
+        until @obj.empty?
+          @obj.each do |item, weight|
+            start += weight
+            if yield([item, start])
+              @obj.delete item
+            end
+          end
+        end
+      end
+    end
+
   class MappedList
-    include Enumerable
-    attr_reader :list, :func, :uniq, :max
+    attr_reader :list, :func, :uniq
 
     def initialize(list, func, uniq=false)
       @func = func
@@ -37,43 +54,18 @@ class Pickup
     end
 
     def each(&blk)
-      item_iterator = next_item
-      item = nil
-      drop = false
-      while true do
-        item ||= item_iterator.call(drop)
-        drop = false
+      CircleIterator.new(@list).each do |item|
         if uniq
-          drop = true if yield item
-          item = nil 
+          true if yield item
         else
-          item = nil unless yield item
+          nil while yield(item)
         end
-      end
-    end
-
-    def next_item
-      dup   = list.dup
-      start = 0
-      enum  = dup.to_enum
-      item  = nil
-      Proc.new do |drop|
-        dup.delete item if drop
-        item = begin
-          enum.next
-        rescue StopIteration => e
-          enum = dup.to_enum
-          enum.next
-        end
-        start += item[1]
-        item[1] = start
-        item
       end
     end
 
     def random(count)
       raise "List is shorter then count of items you want to get" if uniq && list.size < count
-      nums = count.times.map{ func.call(rand(max)) }.sort
+      nums = count.times.map{ rand(func.call(max)) }.sort
       get_random_items(nums)
     end
 
@@ -91,6 +83,12 @@ class Pickup
         end
       end
       items
+    end
+
+    def max
+      @max ||= begin
+        list.inject(0){ |mx, item| mx += item[1]}
+      end
     end
   end
 end

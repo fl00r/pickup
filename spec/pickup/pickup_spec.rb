@@ -38,8 +38,16 @@ describe Pickup do
       @ml2.get_random_items([0]).first.must_equal "selmon"
     end
 
+    it "should return crucian 3 times for uniq pickup" do
+      @ml2.get_random_items([7, 7, 7]).must_equal ["crucian", "crucian", "crucian"]
+    end
+
     it "should return item from the beginning after end of list for uniq pickup" do
       @ml.get_random_items([20, 20, 20, 20]).must_equal ["sturgeon", "gudgeon", "minnow", "selmon"]
+    end
+
+    it "should return right max" do
+      @ml.max.must_equal 52
     end
   end
 
@@ -50,5 +58,10 @@ describe Pickup do
 
   it "should raise an exception" do
     proc{ items = @pickup2.pick(8) }.must_raise RuntimeError
+  end
+
+  it "should return include most wegtful item (but not always - sometimes it will fail)" do
+    items = @pickup2.pick(2){ |v| v**20 }
+    (items.include? "minnow").must_equal true
   end
 end
