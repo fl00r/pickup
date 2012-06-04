@@ -92,6 +92,16 @@ pickup.pick(10){ |v| v**10 }
 #=> ["minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow", "minnow"]
 ```
 
+Or you can use reverse probability:
+
+```ruby
+pickup = Pickup.new(pond)
+pickup.pick(10){ |v| v**(-10) }
+#=> ["selmon", "selmon", "selmon", "selmon", "crucian", "selmon", "selmon", "selmon", "selmon", "selmon"]
+```
+
+Reverse
+
 ## Contributing
 
 1. Fork it
