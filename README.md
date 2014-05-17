@@ -101,6 +101,35 @@ pickup.pick
 #=> "sturgeon"
 ```
 
+### Custom key and weight selection functions
+
+We can use more complex collections by defining our own key and weight selectors:
+
+```ruby
+require "ostruct"
+
+pond_ostruct = [
+  OpenStruct.new(:key => "sel", :name => "selmon", :weight => 1),
+  OpenStruct.new(:key => "car", :name => "carp", :weight => 4),
+  OpenStruct.new(:key => "cru", :name => "crucian", :weight => 3),
+  OpenStruct.new(:key => "her", :name => "herring", :weight => 6),
+  OpenStruct.new(:key => "stu", :name => "sturgeon", :weight => 8),
+  OpenStruct.new(:key => "gud", :name => "gudgeon", :weight => 10),
+  OpenStruct.new(:key => "min", :name => "minnow", :weight => 20)
+]
+
+key_func = Proc.new{ |item| item.key }
+weight_func = Proc.new{ |item| item.weight }
+
+pickup = Pickup.new(pond_ostruct, { :uniq => false }, key_func, weight_func)
+pickup.pick
+#=> "gud"
+
+name_func = Proc.new{ |item| item.name }
+pickup.pick(1, name_func)
+#=> "gudgeon"
+```
+
 ## Contributing
 
 1. Fork it
