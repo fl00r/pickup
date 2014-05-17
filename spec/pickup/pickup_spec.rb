@@ -17,7 +17,7 @@ describe Pickup do
     @pickup2 = Pickup.new(@list, uniq: true)
   end
 
-  it "should pick correct ammount of items" do
+  it "should pick correct amount of items" do
     @pickup.pick(2).size.must_equal 2
     @pickup.pick(10).size.must_equal 10
   end
@@ -60,12 +60,12 @@ describe Pickup do
     proc{ items = @pickup2.pick(8) }.must_raise RuntimeError
   end
 
-  it "should return include most weigtfull item (but not always - sometimes it will fail)" do
+  it "should return a list of items including the heaviest item (but not always - sometimes it will fail)" do
     items = @pickup2.pick(2){ |v| v**20 }
     (items.include? "minnow").must_equal true
   end
 
-  it "should return include less weigtfull item (but not always - sometimes it will fail)" do
+  it "should return a list of items including the lightest item (but not always - sometimes it will fail)" do
     items = @pickup2.pick(2){ |v| v**(-20) }
     (items.include? "selmon").must_equal true
   end
