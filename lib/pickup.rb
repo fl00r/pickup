@@ -4,19 +4,19 @@ class Pickup
   attr_reader :list, :uniq
   attr_writer :pick_func, :key_func, :weight_func
 
-  def initialize(list, opts={}, key_func=nil, weight_func=nil, &block)
+  def initialize(list, opts={}, &block)
     @list = list
     @uniq = opts[:uniq] || false
     @pick_func = block if block_given?
-    @key_func = key_func
-    @weight_func = weight_func
+    @key_func = opts[:key_func]
+    @weight_func = opts[:weight_func]
   end
 
-  def pick(count=1, key_func=nil, weight_func=nil, &block)
+  def pick(count=1, opts={}, &block)
     func = block || pick_func
-    kfunc = key_func || @key_func
-    wfunc = weight_func || @weight_func
-    mlist = MappedList.new(list, func, uniq, kfunc, wfunc)
+    key_func = opts[:key_func] || @key_func
+    weight_func = opts[:weight_func] || @weight_func
+    mlist = MappedList.new(list, func, uniq, key_func: key_func, weight_func: weight_func)
     result = mlist.random(count)
     count == 1 ? result.first : result
   end
@@ -32,12 +32,12 @@ class Pickup
   class CircleIterator
     attr_reader :func, :obj, :max, :key_func, :weight_func
 
-    def initialize(obj, func, max, key_func=nil, weight_func=nil)
+    def initialize(obj, func, max, opts={})
       @obj = obj.dup
       @func = func
       @max = max
-      @key_func = key_func || self.key_func
-      @weight_func = weight_func || self.weight_func
+      @key_func = opts[:key_func] || key_func
+      @weight_func = opts[:weight_func] || weight_func
     end
 
     def key_func
@@ -77,12 +77,12 @@ class Pickup
   class MappedList
     attr_reader :list, :func, :uniq, :key_func, :weight_func
 
-    def initialize(list, func, uniq=false, key_func=nil, weight_func=nil)
+    def initialize(list, func, uniq=false, opts={})
       @func = func
       @uniq = uniq
       @list = list
-      @key_func = key_func
-      @weight_func = weight_func || self.weight_func
+      @key_func = opts[:key_func]
+      @weight_func = opts[:weight_func] || weight_func
       @current_state = 0
     end
 
@@ -95,7 +95,7 @@ class Pickup
     end
 
     def each(&blk)
-      CircleIterator.new(@list, func, max, @key_func, weight_func).each do |item|
+      CircleIterator.new(@list, func, max, key_func: @key_func, weight_func: weight_func).each do |item|
         if uniq
           true if yield item
         else

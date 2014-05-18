@@ -14,7 +14,7 @@ describe Pickup do
       "minnow" => 20      # 52
     }
 
-    @struct_list = @list.map{ |key, weight| OpenStruct.new(:key => key, :weight => weight) }
+    @struct_list = @list.map{ |key, weight| OpenStruct.new(key: key, weight: weight) }
 
     @func = Proc.new{ |a| a }
     @pickup = Pickup.new(@list)
@@ -22,7 +22,7 @@ describe Pickup do
 
     @key_func = Proc.new{ |item| item.key }
     @weight_func = Proc.new{ |item| item.weight }
-    @pickup3 = Pickup.new(@struct_list, {:uniq => false}, @key_func, @weight_func)
+    @pickup3 = Pickup.new(@struct_list, key_func: @key_func, weight_func: @weight_func)
   end
 
   it "should pick correct ammount of items" do
@@ -34,8 +34,8 @@ describe Pickup do
     before do
       @ml = Pickup::MappedList.new(@list, @func, true)
       @ml2 = Pickup::MappedList.new(@list, @func)
-      @ml3 = Pickup::MappedList.new(@struct_list, @func, false, @key_func, @weight_func)
-      @ml4 = Pickup::MappedList.new(@struct_list, @func, true, @key_func, @weight_func)
+      @ml3 = Pickup::MappedList.new(@struct_list, @func, false, key_func: @key_func, weight_func: @weight_func)
+      @ml4 = Pickup::MappedList.new(@struct_list, @func, true, key_func: @key_func, weight_func: @weight_func)
     end
 
     it "should return selmon and then carp and then crucian for uniq pickup" do
@@ -98,6 +98,6 @@ describe Pickup do
   end
 
   it "should take 5 fish (using custom weight function)" do
-    @pickup3.pick(5, @key_func, @weight_func).size.must_equal 5
+    @pickup3.pick(5, key_func: @key_func, weight_func: @weight_func).size.must_equal 5
   end
 end
