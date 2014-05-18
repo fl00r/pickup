@@ -1,5 +1,7 @@
 # encoding: utf-8
 require 'spec_helper'
+require 'ostruct'
+require 'stringio'
 
 describe Pickup do
   before do
@@ -12,9 +14,16 @@ describe Pickup do
       "gudgeon" => 10,    # 32
       "minnow" => 20      # 52
     }
+
+    @struct_list = @list.map{ |key, weight| OpenStruct.new(key: key, weight: weight) }
+
     @func = Proc.new{ |a| a }
     @pickup = Pickup.new(@list)
     @pickup2 = Pickup.new(@list, uniq: true)
+
+    @key_func = Proc.new{ |item| item.key }
+    @weight_func = Proc.new{ |item| item.weight }
+    @pickup3 = Pickup.new(@struct_list, key_func: @key_func, weight_func: @weight_func)
   end
 
   it "should pick correct amount of items" do
@@ -24,8 +33,25 @@ describe Pickup do
 
   describe Pickup::MappedList do
     before do
-      @ml = Pickup::MappedList.new(@list, @func, true)
+      @ml = Pickup::MappedList.new(@list, @func, uniq: true)
       @ml2 = Pickup::MappedList.new(@list, @func)
+      @ml3 = Pickup::MappedList.new(@struct_list, @func, key_func: @key_func, weight_func: @weight_func)
+      @ml4 = Pickup::MappedList.new(@struct_list, @func, uniq: true, key_func: @key_func, weight_func: @weight_func)
+    end
+
+    it "deprecated warning on initialization if uniq is passed directly as a boolean" do
+      # Swap in a fake IO object for $stderr.
+      orig_stderr = $stderr
+      $stderr = StringIO.new
+
+      Pickup::MappedList.new(@list, @func, true)
+
+      # Inspect the fake IO object for the deprecated warning.
+      $stderr.rewind
+      $stderr.string.chomp.must_equal("[DEPRECATED] Passing uniq as a boolean to MappedList's initialize method is deprecated. Please use the opts hash instead.")
+    
+      # Restore the original stderr.
+      $stderr = orig_stderr
     end
 
     it "should return selmon and then carp and then crucian for uniq pickup" do
@@ -49,6 +75,18 @@ describe Pickup do
     it "should return right max" do
       @ml.max.must_equal 52
     end
+
+    it "should return selmon 4 times for non-uniq pickup (using custom weight function)" do
+      4.times{ @ml3.get_random_items([0]).first.must_equal "selmon" }
+    end
+
+    it "should return right max (using custom weight function)" do
+      @ml3.max.must_equal 52
+    end
+
+    it "should return selmon and then carp and then crucian for uniq pickup (using custom weight function)" do
+      @ml4.get_random_items([0, 0, 0]).must_equal ["selmon", "carp", "crucian"]
+    end
   end
 
   it "should take 7 different fish" do
@@ -68,5 +106,14 @@ describe Pickup do
   it "should return a list of items including the lightest item (but not always - sometimes it will fail)" do
     items = @pickup2.pick(2){ |v| v**(-20) }
     (items.include? "selmon").must_equal true
+  end
+
+  it "should pick correct amount of items (using custom weight function)" do
+    @pickup3.pick(4).size.must_equal 4
+    @pickup3.pick(12).size.must_equal 12
+  end
+
+  it "should take 5 fish (using custom weight function)" do
+    @pickup3.pick(5, key_func: @key_func, weight_func: @weight_func).size.must_equal 5
   end
 end
