@@ -34,7 +34,7 @@ describe Pickup do
   describe Pickup::MappedList do
     before do
       @ml = Pickup::MappedList.new(@list, @func, uniq: true)
-      @ml2 = Pickup::MappedList.new(@list, @func, uniq: false)
+      @ml2 = Pickup::MappedList.new(@list, @func)
       @ml3 = Pickup::MappedList.new(@struct_list, @func, key_func: @key_func, weight_func: @weight_func)
       @ml4 = Pickup::MappedList.new(@struct_list, @func, uniq: true, key_func: @key_func, weight_func: @weight_func)
     end

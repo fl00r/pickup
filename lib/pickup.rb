@@ -77,14 +77,18 @@ class Pickup
   class MappedList
     attr_reader :list, :func, :uniq, :key_func, :weight_func
 
-    def initialize(list, func, opts=false)
+    def initialize(list, func, opts=nil)
       if Hash === opts
         @key_func = opts[:key_func]
         @weight_func = opts[:weight_func] || weight_func
         @uniq = opts[:uniq] || false
       else
-        warn "[DEPRECATED] Passing uniq as a boolean to MappedList's initialize method is deprecated. Please use the opts hash instead."
-        @uniq = opts
+        if !!opts == opts
+          # If opts is explicitly provided as a boolean, show the deprecated warning.
+          warn "[DEPRECATED] Passing uniq as a boolean to MappedList's initialize method is deprecated. Please use the opts hash instead."
+        end
+
+        @uniq = opts || false
       end
 
       @func = func
