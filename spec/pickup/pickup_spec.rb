@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'spec_helper'
 require 'ostruct'
+require 'stringio'
 
 describe Pickup do
   before do
@@ -32,10 +33,25 @@ describe Pickup do
 
   describe Pickup::MappedList do
     before do
-      @ml = Pickup::MappedList.new(@list, @func, true)
-      @ml2 = Pickup::MappedList.new(@list, @func)
-      @ml3 = Pickup::MappedList.new(@struct_list, @func, false, key_func: @key_func, weight_func: @weight_func)
-      @ml4 = Pickup::MappedList.new(@struct_list, @func, true, key_func: @key_func, weight_func: @weight_func)
+      @ml = Pickup::MappedList.new(@list, @func, uniq: true)
+      @ml2 = Pickup::MappedList.new(@list, @func, uniq: false)
+      @ml3 = Pickup::MappedList.new(@struct_list, @func, key_func: @key_func, weight_func: @weight_func)
+      @ml4 = Pickup::MappedList.new(@struct_list, @func, uniq: true, key_func: @key_func, weight_func: @weight_func)
+    end
+
+    it "deprecated warning on initialization if uniq is passed directly as a boolean" do
+      # Swap in a fake IO object for $stderr.
+      orig_stderr = $stderr
+      $stderr = StringIO.new
+
+      Pickup::MappedList.new(@list, @func, true)
+
+      # Inspect the fake IO object for the deprecated warning.
+      $stderr.rewind
+      $stderr.string.chomp.must_equal("[DEPRECATED] Passing uniq as a boolean to MappedList's initialize method is deprecated. Please use the opts hash instead.")
+    
+      # Restore the original stderr.
+      $stderr = orig_stderr
     end
 
     it "should return selmon and then carp and then crucian for uniq pickup" do

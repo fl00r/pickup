@@ -16,7 +16,7 @@ class Pickup
     func = block || pick_func
     key_func = opts[:key_func] || @key_func
     weight_func = opts[:weight_func] || @weight_func
-    mlist = MappedList.new(list, func, uniq, key_func: key_func, weight_func: weight_func)
+    mlist = MappedList.new(list, func, uniq: uniq, key_func: key_func, weight_func: weight_func)
     result = mlist.random(count)
     count == 1 ? result.first : result
   end
@@ -77,12 +77,18 @@ class Pickup
   class MappedList
     attr_reader :list, :func, :uniq, :key_func, :weight_func
 
-    def initialize(list, func, uniq=false, opts={})
+    def initialize(list, func, opts=false)
+      if Hash === opts
+        @key_func = opts[:key_func]
+        @weight_func = opts[:weight_func] || weight_func
+        @uniq = opts[:uniq] || false
+      else
+        warn "[DEPRECATED] Passing uniq as a boolean to MappedList's initialize method is deprecated. Please use the opts hash instead."
+        @uniq = opts
+      end
+
       @func = func
-      @uniq = uniq
       @list = list
-      @key_func = opts[:key_func]
-      @weight_func = opts[:weight_func] || weight_func
       @current_state = 0
     end
 
