@@ -14,4 +14,5 @@ Gem::Specification.new do |gem|
   gem.name          = "pickup"
   gem.require_paths = ["lib"]
   gem.version       = Pickup::VERSION
+  gem.required_ruby_version = ">= 1.9"
 end
