@@ -1,6 +1,6 @@
 # Pickup
 
-Pickup helps you to pick item from collection by it's weight/probability
+Pickup helps you to pick an item from a collection by its weight or probability.
 
 ## Installation
 
