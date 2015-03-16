@@ -4,6 +4,7 @@ require 'ostruct'
 require 'stringio'
 
 describe Pickup do
+
   before do
     @list = {
       "selmon"  => 1,     # 1
@@ -49,7 +50,7 @@ describe Pickup do
       # Inspect the fake IO object for the deprecated warning.
       $stderr.rewind
       $stderr.string.chomp.must_equal("[DEPRECATED] Passing uniq as a boolean to MappedList's initialize method is deprecated. Please use the opts hash instead.")
-    
+
       # Restore the original stderr.
       $stderr = orig_stderr
     end
@@ -115,5 +116,12 @@ describe Pickup do
 
   it "should take 5 fish (using custom weight function)" do
     @pickup3.pick(5, key_func: @key_func, weight_func: @weight_func).size.must_equal 5
+  end
+
+  let(:list) { { "foo" => 0 } }
+  let(:pickup) { Pickup.new(list) }
+
+  it "should not devide by zero" do
+    pickup.pick(1)
   end
 end

@@ -117,6 +117,7 @@ class Pickup
     def random(count)
       raise "List is shorter then count of items you want to get" if uniq && list.size < count
       nums = count.times.map{ rand(max) }.sort
+      return [] if max == 0
       get_random_items(nums)
     end
 
