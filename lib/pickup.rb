@@ -1,10 +1,13 @@
-require "pickup/version"
+require 'pickup/version'
 
 class Pickup
+  require 'pickup/circle_iterator'
+  require 'pickup/mapped_list'
+
   attr_reader :list, :uniq
   attr_writer :pick_func, :key_func, :weight_func
 
-  def initialize(list, opts={}, &block)
+  def initialize(list, opts = {}, &block)
     @list = list
     @uniq = opts[:uniq] || false
     @pick_func = block if block_given?
@@ -12,7 +15,7 @@ class Pickup
     @weight_func = Pickup.func_opt(opts[:weight_func])
   end
 
-  def pick(count=1, opts={}, &block)
+  def pick(count = 1, opts = {}, &block)
     func = block || pick_func
     key_func = Pickup.func_opt(opts[:key_func]) || @key_func
     weight_func = Pickup.func_opt(opts[:weight_func]) || @weight_func
@@ -22,129 +25,10 @@ class Pickup
   end
 
   def pick_func
-    @pick_func ||= begin
-      Proc.new do |val|
-        val
-      end
-    end
+    @pick_func ||= proc { |val| val }
   end
 
   def self.func_opt(opt)
     opt.is_a?(Symbol) ? opt.to_proc : opt
-  end
-
-  class CircleIterator
-    attr_reader :func, :obj, :max, :key_func, :weight_func
-
-    def initialize(obj, func, max, opts={})
-      @obj = obj.dup
-      @func = func
-      @max = max
-      @key_func = Pickup.func_opt(opts[:key_func]) || key_func
-      @weight_func = Pickup.func_opt(opts[:weight_func]) || weight_func
-    end
-
-    def key_func
-      @key_func ||= begin
-        Proc.new do |item|
-          item[0]
-        end
-      end
-    end
-
-    def weight_func
-      @weight_func ||= begin
-        Proc.new do |item|
-          item[1]
-        end
-      end
-    end
-
-    def each
-      until obj.empty?
-        start = 0
-        obj.each do |item|
-          key = key_func.call(item)
-          weight = weight_func.call(item)
-
-          val = func.call(weight)
-          start += val
-          if yield([key, start, max])
-            obj.delete key
-            @max -= val
-          end
-        end
-      end
-    end
-  end
-
-  class MappedList
-    attr_reader :list, :func, :uniq, :key_func, :weight_func
-
-    def initialize(list, func, opts=nil)
-      if Hash === opts
-        @key_func = Pickup.func_opt(opts[:key_func])
-        @weight_func = Pickup.func_opt(opts[:weight_func]) || weight_func
-        @uniq = opts[:uniq] || false
-      else
-        if !!opts == opts
-          # If opts is explicitly provided as a boolean, show the deprecated warning.
-          warn "[DEPRECATED] Passing uniq as a boolean to MappedList's initialize method is deprecated. Please use the opts hash instead."
-        end
-
-        @uniq = opts || false
-      end
-
-      @func = func
-      @list = list
-      @current_state = 0
-    end
-
-    def weight_func
-      @weight_func ||= begin
-        Proc.new do |item|
-          item[1]
-        end
-      end
-    end
-
-    def each(&blk)
-      CircleIterator.new(@list, func, max, key_func: @key_func, weight_func: weight_func).each do |item|
-        if uniq
-          true if yield item
-        else
-          nil while yield(item)
-        end
-      end
-    end
-
-    def random(count)
-      raise "List is shorter than count of items you want to get" if uniq && list.size < count
-      nums = count.times.map{ rand(max) }.sort
-      return [] if max == 0
-      get_random_items(nums)
-    end
-
-    def get_random_items(nums)
-      current_num = nums.shift
-      items = []
-      each do |item, counter, mx|
-        break unless current_num
-        if counter%(mx+1) > current_num%mx
-          items << item
-          current_num = nums.shift
-          true
-        end
-      end
-      items
-    end
-
-    def max
-      @max ||= begin
-        max = 0
-        list.each{ |item| max += func.call(weight_func.call(item)) }
-        max
-      end
-    end
   end
 end
