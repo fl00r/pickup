@@ -8,14 +8,14 @@ class Pickup
     @list = list
     @uniq = opts[:uniq] || false
     @pick_func = block if block_given?
-    @key_func = opts[:key_func]
-    @weight_func = opts[:weight_func]
+    @key_func = Pickup.func_opt(opts[:key_func])
+    @weight_func = Pickup.func_opt(opts[:weight_func])
   end
 
   def pick(count=1, opts={}, &block)
     func = block || pick_func
-    key_func = opts[:key_func] || @key_func
-    weight_func = opts[:weight_func] || @weight_func
+    key_func = Pickup.func_opt(opts[:key_func]) || @key_func
+    weight_func = Pickup.func_opt(opts[:weight_func]) || @weight_func
     mlist = MappedList.new(list, func, uniq: uniq, key_func: key_func, weight_func: weight_func)
     result = mlist.random(count)
     count == 1 ? result.first : result
@@ -29,6 +29,10 @@ class Pickup
     end
   end
 
+  def self.func_opt(opt)
+    opt.is_a?(Symbol) ? opt.to_proc : opt
+  end
+
   class CircleIterator
     attr_reader :func, :obj, :max, :key_func, :weight_func
 
@@ -36,8 +40,8 @@ class Pickup
       @obj = obj.dup
       @func = func
       @max = max
-      @key_func = opts[:key_func] || key_func
-      @weight_func = opts[:weight_func] || weight_func
+      @key_func = Pickup.func_opt(opts[:key_func]) || key_func
+      @weight_func = Pickup.func_opt(opts[:weight_func]) || weight_func
     end
 
     def key_func
@@ -79,8 +83,8 @@ class Pickup
 
     def initialize(list, func, opts=nil)
       if Hash === opts
-        @key_func = opts[:key_func]
-        @weight_func = opts[:weight_func] || weight_func
+        @key_func = Pickup.func_opt(opts[:key_func])
+        @weight_func = Pickup.func_opt(opts[:weight_func]) || weight_func
         @uniq = opts[:uniq] || false
       else
         if !!opts == opts
