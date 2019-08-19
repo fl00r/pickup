@@ -10,11 +10,11 @@ Add this line to your application's Gemfile:
 
 And then execute:
 
-    $ bundle
+    bundle
 
 Or install it yourself as:
 
-    $ gem install pickup
+    gem install pickup
 
 ## Usage
 
@@ -31,6 +31,7 @@ pond = {
   "minnow" => 20
 }
 ```
+
 Values are a chance (probability) to get this fish.
 
 So we should create our pickup.
@@ -40,6 +41,7 @@ pickup = Pickup.new(pond)
 pickup.pick(3)
 #=> [ "gudgeon", "minnow", "minnow" ]
 ```
+
 Look, we've just catched few minnows! To get selmon we need some more tries ;)
 
 ### Custom distribution function
@@ -51,6 +53,7 @@ pickup = Pickup.new(pond){ |v| v**2 }
 pickup.pick(3)
 #=> ["carp", "selmon", "crucian"]
 ```
+
 Wow, good catch!
 
 Also you can change our "function" on the fly. Let's make square function:
@@ -59,6 +62,7 @@ Also you can change our "function" on the fly. Let's make square function:
 pickup = Pickup.new(pond)
 pickup.pick_func = Proc.new{ |v| v**2 }
 ```
+
 Or you can pass a block as a probability function wich will be applicable only to current operation
 
 ```ruby
@@ -109,19 +113,22 @@ We can use more complex collections by defining our own key and weight selectors
 require "ostruct"
 
 pond_ostruct = [
-  OpenStruct.new(key: "sel", name: "selmon", weight: 1),
-  OpenStruct.new(key: "car", name: "carp", weight: 4),
-  OpenStruct.new(key: "cru", name: "crucian", weight: 3),
-  OpenStruct.new(key: "her", name: "herring", weight: 6),
+  OpenStruct.new(key: "sel", name: "selmon",   weight: 1),
+  OpenStruct.new(key: "car", name: "carp",     weight: 4),
+  OpenStruct.new(key: "cru", name: "crucian",  weight: 3),
+  OpenStruct.new(key: "her", name: "herring",  weight: 6),
   OpenStruct.new(key: "stu", name: "sturgeon", weight: 8),
-  OpenStruct.new(key: "gud", name: "gudgeon", weight: 10),
-  OpenStruct.new(key: "min", name: "minnow", weight: 20)
+  OpenStruct.new(key: "gud", name: "gudgeon",  weight: 10),
+  OpenStruct.new(key: "min", name: "minnow",   weight: 20)
 ]
 
 key_func = Proc.new{ |item| item.key }
 weight_func = Proc.new{ |item| item.weight }
-
 pickup = Pickup.new(pond_ostruct, key_func: key_func, weight_func: weight_func)
+
+# Symbol values for funcs will be converted into Procs:
+pickup = Pickup.new(pond_ostruct, key_func: :key, weight_func: :weight)
+
 pickup.pick
 #=> "gud"
 
